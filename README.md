@@ -2,7 +2,7 @@
 Reverse Mode Automatic Differentiation 
 
 Even though there are lots of automatic differentiation libraries and deep learning frameworks,
-in order to gain knowledge in the inner process of this frameworks I made a personal implementation 
+in order to gain knowledge in the inner process of these frameworks I made a personal implementation 
 of reverse mode automatic differentiation in C++.
 
 ## How it works? ##
