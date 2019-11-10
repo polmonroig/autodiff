@@ -1,44 +1,41 @@
 #include <iostream>
-#include <cmath>
-
 #include "autodiff/Variable.h"
-
+#include "autodiff/Tensor.h"
 
 int main() {
 
-    autodiff::Tape gradient_tape;
+    uint n_neurons = 10;
+    uint n_inputs = 1;
+    uint batch_size = 10;
+    auto weights = autodiff::Tensor::rand({n_inputs, n_neurons}, true);
+    auto weights2 = autodiff::Tensor::rand({n_neurons,  1}, true);
+    auto x = autodiff::Tensor::rand({batch_size, n_inputs}, false);
+    auto y = autodiff::Tensor::rand({batch_size, n_neurons}, false);
+    auto learning_rate = autodiff::Variable(0.001);
+    auto y_pred = x.matmul(weights).matmul(weights2);
 
-    auto weight = gradient_tape.variable(-0.5, "weight");
-    auto bias = gradient_tape.variable(0.5, "bias");
-    auto x = autodiff::Variable(1);
 
-    auto learning_rate = autodiff::Variable(0.01);
-    auto y_true = autodiff::Variable(3);
-    uint n_epochs = 500;
-    std::cout << "weight: " << weight.get_value() << std::endl;
+    /*auto w = autodiff::Variable(3.0, true);
+    auto x = autodiff::Variable(3.0);
+    auto y = autodiff::Variable(3.0);
+    auto learning_rate = autodiff::Variable(0.001);
+    uint n_epochs = 100;
+    std::cout << "weight: " << w.get_value() << std::endl;
     for(uint i = 0; i < n_epochs; ++i){
         std::cout << "Epoch: " << i << std::endl;
-        auto y_pred = weight * x + bias;
-
-        auto mse = (y_pred - y_true).pow(2);
+        auto y_pred = x*w;
+        auto mse = (y_pred - y).pow(2);
         auto gradients = mse.grad();
-
-        std::cout << "y_pred_value: " << y_pred.get_value() << std::endl;
-        std::cout << "y_true_value: " << y_true.get_value() << std::endl;
-        std::cout << "weight_grad: " << gradients.at(weight.get_index()).get_value() << std::endl;
-        std::cout << "bias_grad: " << gradients.at(bias.get_index()).get_value() << std::endl;
-        gradient_tape.clean(); // remove old nodes
-        weight = weight - learning_rate * gradients.at(weight.get_index());
-        bias = bias - learning_rate * gradients.at(bias.get_index());
-        std::cout << "new_weight: " << weight.get_value() << std::endl;
-        std::cout << "new_bias: " << bias.get_value() << std::endl;
-        std::cout << "========================" << std::endl;
-    }
+        std::cout << "y_pred: " << y_pred.get_value() << std::endl;
+        std::cout << "y_true: " << y.get_value() << std::endl;
+        std::cout << "w_grad: " << gradients.at({w.get_index()}).get_value() << std::endl;
+        autodiff::gradient_tape.clean();
+        w = w - learning_rate * gradients.at({w.get_index()});
 
 
-
-
-
+        std::cout << "new_weight: " << w.get_value() << std::endl;
+        std::cout << "====================" << std::endl;
+    }*/
 
     return 0;
 }

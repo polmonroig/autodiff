@@ -123,6 +123,33 @@ autodiff/fast:
 	$(MAKE) -f CMakeFiles/autodiff.dir/build.make CMakeFiles/autodiff.dir/build
 .PHONY : autodiff/fast
 
+autodiff/Dense.o: autodiff/Dense.cpp.o
+
+.PHONY : autodiff/Dense.o
+
+# target to build an object file
+autodiff/Dense.cpp.o:
+	$(MAKE) -f CMakeFiles/autodiff.dir/build.make CMakeFiles/autodiff.dir/autodiff/Dense.cpp.o
+.PHONY : autodiff/Dense.cpp.o
+
+autodiff/Dense.i: autodiff/Dense.cpp.i
+
+.PHONY : autodiff/Dense.i
+
+# target to preprocess a source file
+autodiff/Dense.cpp.i:
+	$(MAKE) -f CMakeFiles/autodiff.dir/build.make CMakeFiles/autodiff.dir/autodiff/Dense.cpp.i
+.PHONY : autodiff/Dense.cpp.i
+
+autodiff/Dense.s: autodiff/Dense.cpp.s
+
+.PHONY : autodiff/Dense.s
+
+# target to generate assembly for a file
+autodiff/Dense.cpp.s:
+	$(MAKE) -f CMakeFiles/autodiff.dir/build.make CMakeFiles/autodiff.dir/autodiff/Dense.cpp.s
+.PHONY : autodiff/Dense.cpp.s
+
 autodiff/Tape.o: autodiff/Tape.cpp.o
 
 .PHONY : autodiff/Tape.o
@@ -240,6 +267,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... autodiff"
 	@echo "... edit_cache"
+	@echo "... autodiff/Dense.o"
+	@echo "... autodiff/Dense.i"
+	@echo "... autodiff/Dense.s"
 	@echo "... autodiff/Tape.o"
 	@echo "... autodiff/Tape.i"
 	@echo "... autodiff/Tape.s"

@@ -2,22 +2,12 @@
 // Created by pol on 11/8/19.
 //
 
+#include <random>
+#include <chrono>
 #include "Tape.h"
 #include "Tensor.h"
 
 
-autodiff::Variable autodiff::Tape::variable(float value, std::string const &name) {
-    return autodiff::Variable(value, name, this, push_leaf());
-}
-
-autodiff::Tensor autodiff::Tape::tensor1d(std::vector<float> values, std::string const &name) {
-    std::vector<uint> shape(1, values.size());
-    autodiff::Tensor tensor(shape, this);
-    for(int i = 0; i < values.size(); ++i){
-        tensor.set_var(i, Tape::variable(values[i], name));
-    }
-    return tensor;
-}
 
 
 uint autodiff::Tape::push_leaf() {
@@ -55,3 +45,8 @@ autodiff::Node autodiff::Tape::get_node(int i) const {
 void autodiff::Tape::clean() {
     tape = std::vector<Node>();
 }
+namespace autodiff{
+    autodiff::Tape gradient_tape = autodiff::Tape();
+}
+
+

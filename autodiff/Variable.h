@@ -20,18 +20,16 @@ namespace autodiff{
 
     private:
         std::string name;
-        float value{};
+        float value = 0.0;
         uint index{};
+        bool _requires_grad{};
 
-        autodiff::Tape *tape{};
 
     public:
 
         Variable();
 
-        Variable(float value, std::string const& name="var");
-
-        Variable(float value, std::string const &name, autodiff::Tape *tape, uint index);
+        Variable(float value, bool requires_grad=false, std::string const& name="var");
 
         autodiff::Tensor grad();
 
@@ -41,6 +39,8 @@ namespace autodiff{
 
         bool requires_grad() const;
 
+        void record_var(int i);
+
         /*
          * OPERATORS
          * */
@@ -49,9 +49,9 @@ namespace autodiff{
 
         Variable pow(float power) const;
 
-        Variable operator*(const Variable &v2);
+        Variable operator*(const Variable &v2)const;
 
-        Variable operator+(const Variable &v2);
+        Variable operator+(const Variable &v2) const;
 
         Variable operator-(const Variable &v2);
 

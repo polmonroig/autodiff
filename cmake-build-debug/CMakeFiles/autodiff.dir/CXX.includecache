@@ -6,12 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/home/pol/Documents/ml/autodiff/autodiff/Tape.cpp
-Tape.h
-/home/pol/Documents/ml/autodiff/autodiff/Tape.h
-Tensor.h
-/home/pol/Documents/ml/autodiff/autodiff/Tensor.h
-
 /home/pol/Documents/ml/autodiff/autodiff/Tape.h
 utility
 -
@@ -22,25 +16,11 @@ Variable.h
 Tensor.h
 /home/pol/Documents/ml/autodiff/autodiff/Tensor.h
 
-/home/pol/Documents/ml/autodiff/autodiff/Tensor.cpp
-stdexcept
--
-random
--
-Tensor.h
-/home/pol/Documents/ml/autodiff/autodiff/Tensor.h
-
 /home/pol/Documents/ml/autodiff/autodiff/Tensor.h
 vector
 -
 Variable.h
 /home/pol/Documents/ml/autodiff/autodiff/Variable.h
-
-/home/pol/Documents/ml/autodiff/autodiff/Variable.cpp
-Variable.h
-/home/pol/Documents/ml/autodiff/autodiff/Variable.h
-cmath
--
 
 /home/pol/Documents/ml/autodiff/autodiff/Variable.h
 vector
@@ -53,8 +33,8 @@ Tape.h
 /home/pol/Documents/ml/autodiff/main.cpp
 iostream
 -
-cmath
--
 autodiff/Variable.h
 /home/pol/Documents/ml/autodiff/autodiff/Variable.h
+autodiff/Tensor.h
+/home/pol/Documents/ml/autodiff/autodiff/Tensor.h
 

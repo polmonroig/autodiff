@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/autodiff.dir/autodiff/Dense.cpp.o"
   "CMakeFiles/autodiff.dir/autodiff/Tape.cpp.o"
   "CMakeFiles/autodiff.dir/autodiff/Tensor.cpp.o"
   "CMakeFiles/autodiff.dir/autodiff/Variable.cpp.o"

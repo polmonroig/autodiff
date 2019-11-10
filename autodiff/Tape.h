@@ -15,7 +15,8 @@ namespace autodiff{
 
 
     class Variable;
-    class Tensor;
+
+
 
     struct Node{
         std::pair<float, float> weights;
@@ -29,7 +30,6 @@ namespace autodiff{
         std::vector<Node> tape;
 
     public:
-        autodiff::Variable variable(float value, std::string const& name);
 
         Node get_node(int i) const;
 
@@ -41,10 +41,12 @@ namespace autodiff{
 
         uint push_binary(Node var);
 
-        autodiff::Tensor tensor1d(std::vector<float> values, const std::string &name);
-
         void clean();
+
     };
+
+    extern Tape gradient_tape;
+
 }
 
 

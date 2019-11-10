@@ -18,28 +18,34 @@ namespace autodiff{
         std::vector<uint> shape;
         uint size;
         std::vector<autodiff::Variable> parameters;
-        autodiff::Tape *tape;
-    public:
-        explicit Tensor(std::vector<uint> const& shape, Tape* tape);
-        explicit Tensor(std::vector<float> const& values);
+        std::vector<autodiff::Tensor> sub_tensors;
+        uint is_leaf;
+        bool _requires_grad;
 
+    public:
+        explicit Tensor(std::vector<uint> const& shape, bool requires_grad = false);
+
+        static autodiff::Tensor rand(std::vector<uint> const& shape, bool requires_grad);
+
+        void record_parameters();
+
+
+        void set_var(std::vector<uint> const& indexes, autodiff::Variable const& var);
+
+        void add(std::vector<uint> const &indexes, autodiff::Variable const& var);
+
+        autodiff::Variable at(std::vector<uint> const &indexes);
+
+        void fill_random(bool requires_grad);
+
+        Variable dot(const Tensor &t2);
 
         bool requires_grad() const;
 
-        void set_var(int i, Variable const &variable);
-
-        autodiff::Variable dot(Tensor const& t2);
-
-        Tensor operator*(const Variable &v2);
-
-        Tensor operator+(const Tensor &t2);
-
-        Tensor operator-(const Tensor &t2);
-
-        autodiff::Variable at(int i);
-
-        void add(int i, Variable const& variable);
+        Tensor matmul( Tensor &t2);
     };
+
+    std::ostream& operator<<(std::ostream&, const autodiff::Tensor&);
 }
 
 

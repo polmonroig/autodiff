@@ -6,12 +6,13 @@
 #include <cmath>
 
 
-autodiff::Variable::Variable(float value, std::string const &name, autodiff::Tape *tape, uint index) {
+autodiff::Variable::Variable(float value, bool requires_grad, std::string const& name) {
     this->value = value;
     this->name = name;
-    this->tape = tape;
-    this->index = index;
-
+    this->_requires_grad = requires_grad;
+    if(requires_grad){
+        this->index = autodiff::gradient_tape.push_leaf();
+    }
 }
 autodiff::Variable::Variable() = default;
 
@@ -19,14 +20,14 @@ autodiff::Variable::Variable() = default;
 
 autodiff::Tensor autodiff::Variable::grad() {
 
-    uint size = tape->size();
-    Tensor gradients = autodiff::Tensor(std::vector<float>(size));
-    gradients.set_var(index, autodiff::Variable(1.0, ""));
+    uint size = gradient_tape.size();
+    Tensor gradients = autodiff::Tensor({size});
+    gradients.set_var({index}, autodiff::Variable(1.0, false));
     for(int i = size - 1; i >= 0; --i){
-        Node node = tape->get_node(i);
-        gradients.add(node.children.first, autodiff::Variable(node.weights.first, "") * gradients.at(i));
+        Node node = gradient_tape.get_node(i);
+        gradients.add({node.children.first}, autodiff::Variable(node.weights.first, false) * gradients.at({uint(i)}));
         if(node.children.second < size && node.children.second >= 0){
-            gradients.add(node.children.second, autodiff::Variable(node.weights.second, "") * gradients.at(i));
+            gradients.add({node.children.second}, autodiff::Variable(node.weights.second, false) * gradients.at({uint(i)}));
         }
 
     }
@@ -38,49 +39,53 @@ float autodiff::Variable::get_value() const{
 }
 
 
-autodiff::Variable autodiff::Variable::operator*(const Variable &v2) {
+autodiff::Variable autodiff::Variable::operator*(const Variable &v2)const {
     if(requires_grad() && v2.requires_grad()){
-        return Variable(value * v2.value, "mul",
-                        tape, tape->push_binary(Node({v2.value, value}, {index, v2.index})));
+        auto new_var = Variable(value * v2.value, false, "mul");
+        new_var.record_var(gradient_tape.push_binary(Node({v2.value, value}, {index, v2.index})));
+        return new_var;
+
     }
     else if(requires_grad()){
         auto out = *this;
         out.value *= v2.value;
-        out.index = tape->push_unary(index, out.value);
+        out.index = gradient_tape.push_unary(index, out.value);
         return out;
     }
     else if(v2.requires_grad()){
         auto out = v2;
         out.value *= value;
-        out.index = tape->push_unary(index, out.value);
+        out.index = gradient_tape.push_unary(index, out.value);
         return out;
     }
     else{
-        return Variable(value * v2.value, "mul");
+        return Variable(value * v2.value, false, "mul");
     }
 }
 
 
-autodiff::Variable autodiff::Variable::operator+(const Variable &v2) {
+autodiff::Variable autodiff::Variable::operator+(const Variable &v2) const{
 
     if(requires_grad() && v2.requires_grad()){
-        return Variable(value + v2.value, "add",
-                        tape, tape->push_binary(Node({1.0, 1.0}, {index, v2.index})));
+        auto new_var = Variable(value + v2.value, false, "add");
+        new_var.record_var(gradient_tape.push_binary(Node({1.0, 1.0}, {index, v2.index})));
+        return new_var;
+
     }
     else if(requires_grad()){
         auto out = *this;
         out.value += v2.value;
-        out.index = tape->push_unary(index, out.value);
+        out.index = gradient_tape.push_unary(index, out.value);
         return out;
     }
     else if(v2.requires_grad()){
         auto out = v2;
         out.value += value;
-        out.index = tape->push_unary(index, out.value);
+        out.index = gradient_tape.push_unary(index, out.value);
         return out;
     }
     else{
-        return Variable(value + v2.value, "add");
+        return Variable(value + v2.value, false, "add");
     }
 
 }
@@ -88,26 +93,30 @@ autodiff::Variable autodiff::Variable::operator+(const Variable &v2) {
 autodiff::Variable autodiff::Variable::operator-(const Variable &v2) {
 
     if(requires_grad() && v2.requires_grad()){
-        return Variable(value - v2.value, "rest",
-                        tape, tape->push_binary(Node({1.0, 1.0}, {index, v2.index})));
+        auto new_var = Variable(value - v2.value, false, "rest");
+        new_var.record_var(gradient_tape.push_binary(Node({1.0, 1.0}, {index, v2.index})));
+        return new_var;
+
     }
     else if(requires_grad()){
         auto out = *this;
         out.value -= v2.value;
-        out.index = tape->push_unary(index, out.value);
+        out.index = gradient_tape.push_unary(index, out.value);
         return out;
     }
     else if(v2.requires_grad()){
         auto out = v2;
         out.value -= value;
-        out.index = tape->push_unary(index, out.value);
+        out.index =  gradient_tape.push_unary(index, out.value);
         return out;
     }
     else{
-        return Variable(value - v2.value, "rest");
+        return Variable(value - v2.value, false, "rest");
     }
 
 }
+
+
 
 
 
@@ -117,34 +126,36 @@ uint autodiff::Variable::get_index() const {
 
 autodiff::Variable autodiff::Variable::sin() const {
     if(requires_grad()){
-        return Variable(std::sin(value), "sin", tape,
-                        tape->push_unary(index, std::cos(value)));
+        auto new_var = Variable(std::sin(value), false, "sin");
+        new_var.record_var(gradient_tape.push_unary(index, std::cos(value)));
+        return new_var;
     }
     else {
-        return Variable(std::sin(value), "sin");
+        return Variable(std::sin(value), false, "sin");
     }
 
 }
 
 autodiff::Variable autodiff::Variable::pow(float power) const {
     if(requires_grad()){
-        return Variable(std::pow(value, power), "pow", tape,
-                        tape->push_unary(index, power));
+        auto new_var = Variable(std::pow(value, power), false, "pow");
+        new_var.record_var(gradient_tape.push_unary(index, power));
+        return new_var;
     }
     else{
-        return Variable(std::pow(value, power), "pow");
+        return Variable(std::pow(value, power), false, "pow");
     }
 
 }
 
 
-autodiff::Variable::Variable(float value, std::string const &name) {
-    this->value = value;
-    this->name = name;
+bool autodiff::Variable::requires_grad() const {
+    return _requires_grad;
 }
 
-bool autodiff::Variable::requires_grad() const {
-    return tape != nullptr;
+void autodiff::Variable::record_var(int i) {
+    this->index = i;
+    _requires_grad = true;
 }
 
 
