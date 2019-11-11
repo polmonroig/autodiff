@@ -63,6 +63,30 @@ autodiff::Variable autodiff::Variable::operator*(const Variable &v2)const {
     }
 }
 
+autodiff::Variable autodiff::Variable::operator/(const Variable &v2)const {
+    if(requires_grad() && v2.requires_grad()){
+        auto new_var = Variable(value / v2.value, false, "div");
+        new_var.record_var(gradient_tape.push_binary(Node({v2.value, value}, {index, v2.index})));
+        return new_var;
+
+    }
+    else if(requires_grad()){
+        auto out = *this;
+        out.value /= v2.value;
+        out.index = gradient_tape.push_unary(index, out.value);
+        return out;
+    }
+    else if(v2.requires_grad()){
+        auto out = v2;
+        out.value /= value;
+        out.index = gradient_tape.push_unary(index, out.value);
+        return out;
+    }
+    else{
+        return Variable(value / v2.value, false, "div");
+    }
+}
+
 
 autodiff::Variable autodiff::Variable::operator+(const Variable &v2) const{
 
@@ -90,7 +114,7 @@ autodiff::Variable autodiff::Variable::operator+(const Variable &v2) const{
 
 }
 
-autodiff::Variable autodiff::Variable::operator-(const Variable &v2) {
+autodiff::Variable autodiff::Variable::operator-(const Variable &v2) const{
 
     if(requires_grad() && v2.requires_grad()){
         auto new_var = Variable(value - v2.value, false, "rest");

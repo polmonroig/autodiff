@@ -43,6 +43,14 @@ namespace autodiff{
         bool requires_grad() const;
 
         Tensor matmul( Tensor &t2);
+
+        Variable mean();
+
+        void apply_gradients(autodiff::Variable const& learning_rate, const Tensor &gradients);
+
+        autodiff::Tensor operator-(autodiff::Tensor const& t2) const;
+
+        autodiff::Tensor pow(float power) const;
     };
 
     std::ostream& operator<<(std::ostream&, const autodiff::Tensor&);

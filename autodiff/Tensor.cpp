@@ -128,4 +128,68 @@ autodiff::Variable autodiff::Tensor::at(std::vector<uint> const &indexes) {
 
 }
 
+// Pre: t1 and this have the same shape
+autodiff::Tensor autodiff::Tensor::operator-(autodiff::Tensor const& t2) const{
+    Tensor out = Tensor(shape, this->requires_grad() || t2.requires_grad());
+    if(shape.size() > 1){
+        for(int i = 0; i < sub_tensors.size(); ++i){
+            out.sub_tensors[i] = sub_tensors[i] - t2.sub_tensors[i];
+        }
+    }
+    else{
+        for(int i = 0; i < parameters.size(); ++i){
+            out.parameters[i] =  parameters[i] - t2.parameters[i];
+        }
 
+    }
+    return out;
+}
+
+
+autodiff::Variable autodiff::Tensor::mean(){
+    Variable avg = Variable(0.0, true, "mean");
+    if(shape.size() > 1){
+        for(int i = 0; i < sub_tensors.size(); ++i){
+            avg = avg + sub_tensors[i].mean();
+        }
+        avg = avg / sub_tensors.size();
+    }
+    else{
+        for(const auto & parameter : parameters){
+           avg = avg + parameter;
+        }
+        avg = avg / parameters.size();
+    }
+
+    return avg;
+}
+
+autodiff::Tensor autodiff::Tensor::pow(float power) const{
+    Tensor out = Tensor(shape, requires_grad());
+    if(shape.size() > 1){
+        for(int i = 0; i < sub_tensors.size(); ++i) {
+            out.sub_tensors[i] = sub_tensors[i].pow(power);
+        }
+    }
+    else{
+        for(int i = 0; i < parameters.size(); ++i){
+            out.parameters[i] = parameters[i].pow(power);
+        }
+    }
+
+    return out;
+}
+
+void autodiff::Tensor::apply_gradients(autodiff::Variable const& learning_rate, autodiff::Tensor const& gradients){
+    if(shape.size() > 1){
+        for(int i = 0; i < sub_tensors.size(); ++i){
+            sub_tensors[i].apply_gradients(learning_rate, gradients);
+        }
+
+    }
+    else{
+        for(auto & parameter : parameters){
+            parameter = parameter - learning_rate * gradients.parameters[parameter.get_index()];
+        }
+    }
+}
