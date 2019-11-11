@@ -51,6 +51,8 @@ namespace autodiff{
         autodiff::Tensor operator-(autodiff::Tensor const& t2) const;
 
         autodiff::Tensor pow(float power) const;
+
+        static autodiff::Tensor sigmoid(Tensor const &tensor);
     };
 
     std::ostream& operator<<(std::ostream&, const autodiff::Tensor&);

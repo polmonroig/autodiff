@@ -193,3 +193,19 @@ void autodiff::Tensor::apply_gradients(autodiff::Variable const& learning_rate, 
         }
     }
 }
+
+autodiff::Tensor autodiff::Tensor::sigmoid(const autodiff::Tensor &tensor) {
+    Tensor out = Tensor(tensor.shape, tensor.requires_grad());
+    if(tensor.shape.size() > 1){
+        for(int i = 0; i < tensor.sub_tensors.size(); ++i) {
+            out.sub_tensors[i] = Tensor::sigmoid(tensor.sub_tensors[i]);
+        }
+    }
+    else{
+        for(int i = 0; i < tensor.parameters.size(); ++i){
+            out.parameters[i] = Variable::sigmoid(tensor.parameters[i]);
+        }
+    }
+
+    return out;
+}

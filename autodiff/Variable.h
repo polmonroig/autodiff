@@ -56,6 +56,9 @@ namespace autodiff{
         Variable operator-(const Variable &v2) const;
         Variable operator/(const Variable &v2)const;
 
+        static Variable sigmoid(const Variable &var);
+
+        Variable abs() const;
     };
 }
 

@@ -141,7 +141,13 @@ autodiff::Variable autodiff::Variable::operator-(const Variable &v2) const{
 }
 
 
+autodiff::Variable autodiff::Variable::sigmoid(autodiff::Variable const& var){
+    return  var / (Variable(1.0, false) + var.abs());
+}
 
+autodiff::Variable autodiff::Variable::abs() const{
+    return Variable(std::abs(value), requires_grad(), "abs");
+}
 
 
 uint autodiff::Variable::get_index() const {
