@@ -26,3 +26,29 @@ This will return a tensor with the gradients of all the variables that have been
 This class simply represents a mathematical Tensor, that stores Variables, they can either require gradient 
 or not. You can perform different operations with them, such as dot product and matrix multiplication.
  
+
+## Example ##
+The following code represents a sample that simulates a neural network with two layers, no bias, 
+and trains 100 epochs using gradient descent, applying the simple perceptron update rule. It also 
+applies MSE. 
+```cpp
+uint n_neurons = 10;
+uint n_inputs = 1;
+uint batch_size = 10;
+auto weights = autodiff::Tensor::rand({n_inputs, n_neurons}, true);
+auto weights2 = autodiff::Tensor::rand({n_neurons,  1}, true);
+auto x = autodiff::Tensor::rand({batch_size, n_inputs}, false);
+auto y = autodiff::Tensor::rand({batch_size, 1}, false);
+auto learning_rate = autodiff::Variable(0.001);
+
+uint n_epochs = 100;
+for(uint i = 0; i < n_epochs; ++i){
+    auto y_pred = x.matmul(weights).matmul(weights2);
+    auto tmp = (y_pred - y);
+    auto mse = tmp.pow(2).mean();
+    auto gradients = mse.grad();
+    autodiff::gradient_tape.clean();
+    weights.apply_gradients(learning_rate, gradients);
+    weights2.apply_gradients(learning_rate, gradients);
+}
+```
